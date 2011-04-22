@@ -49,7 +49,10 @@ object StatsD extends Runnable {
 
   class Outgoing extends Actor {
     def act {
-
+      loop {
+        // TODO collect and send to graphite
+        Thread.sleep(sleepTime * 1000)
+      }
     }
   }
 }
