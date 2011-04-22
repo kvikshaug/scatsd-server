@@ -5,7 +5,7 @@ import java.net._
 import scala.actors.Actor
 import scala.actors.Actor._
 
-object StatsD extends Actor with Runnable {
+object StatsD extends Runnable {
 
   val sleepTime = 10 // seconds
 
@@ -16,9 +16,10 @@ object StatsD extends Actor with Runnable {
     running = false
   }
 
-  val actor = this
-  actor.start
-
+  val in = new Incoming
+  val out = new Outgoing
+  in.start
+  out.start
 
   def main(args: Array[String]) {
     val s = new DatagramSocket(8125)
@@ -30,17 +31,25 @@ object StatsD extends Actor with Runnable {
     while(running) {
       s.receive(d)
       val str = new String(d.getData, 0, d.getLength)
-      actor ! str
+      in ! str
     }
   }
 
-  def act {
-    loop {
-      receive {
-        case str: String =>
-          // TODO handle string
-          println(str)
+  class Incoming extends Actor {
+    def act {
+      loop {
+        receive {
+          case str: String =>
+            // TODO handle string
+            println(str)
+        }
       }
+    }
+  }
+
+  class Outgoing extends Actor {
+    def act {
+
     }
   }
 }
