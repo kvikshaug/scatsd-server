@@ -14,8 +14,8 @@ object StatsD extends Thread {
   }
 
   def main(args: Array[String]) {
-    val b: Array[Byte] = new Array(1600) // 1600?
     val s = new DatagramSocket(8125)
+    val b: Array[Byte] = new Array(s.getReceiveBufferSize)
     var d = new DatagramPacket(b, b.length)
     println("Listening...")
 
