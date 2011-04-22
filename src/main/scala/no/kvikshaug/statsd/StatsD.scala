@@ -2,16 +2,23 @@ package no.kvikshaug.statsd
 
 import java.net._
 
-object StatsD extends Thread {
+import scala.actors.Actor
+import scala.actors.Actor._
+
+object StatsD extends Actor with Runnable {
 
   val sleepTime = 10 // seconds
 
-  var continue = true
-  Runtime.getRuntime().addShutdownHook(this)
+  var running = true
+  Runtime.getRuntime().addShutdownHook(new Thread(this))
   override def run {
     println("Caught signal; exiting.")
-    continue = false
+    running = false
   }
+
+  val actor = this
+  actor.start
+
 
   def main(args: Array[String]) {
     val s = new DatagramSocket(8125)
@@ -20,15 +27,20 @@ object StatsD extends Thread {
     println("Listening...")
 
     // Main loop
-    while(continue) {
+    while(running) {
       s.receive(d)
-      handleString(new String(d.getData, 0, d.getLength))
-      Thread.sleep(sleepTime * 1000)
+      val str = new String(d.getData, 0, d.getLength)
+      actor ! str
     }
   }
 
-  def handleString(str: String) {
-    // TODO handle string
-    println(str)
+  def act {
+    loop {
+      receive {
+        case str: String =>
+          // TODO handle string
+          println(str)
+      }
+    }
   }
 }
