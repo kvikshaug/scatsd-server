@@ -1,5 +1,7 @@
 package no.kvikshaug.statsd
 
+import java.net._
+
 object StatsD extends Thread {
 
   val sleepTime = 10 // seconds
@@ -12,8 +14,21 @@ object StatsD extends Thread {
   }
 
   def main(args: Array[String]) {
+    val b: Array[Byte] = new Array(1600) // 1600?
+    val s = new DatagramSocket(8125)
+    var d = new DatagramPacket(b, b.length)
+    println("Listening...")
+
+    // Main loop
     while(continue) {
+      s.receive(d)
+      handleString(new String(d.getData, 0, d.getLength))
       Thread.sleep(sleepTime * 1000)
     }
+  }
+
+  def handleString(str: String) {
+    // TODO handle string
+    println(str)
   }
 }
