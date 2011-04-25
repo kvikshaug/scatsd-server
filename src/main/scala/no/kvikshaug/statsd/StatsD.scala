@@ -33,8 +33,7 @@ object StatsD {
 
       while(true) {
         s.receive(d)
-        val str = new String(d.getData, 0, d.getLength)
-        inActor ! str
+        inActor ! new String(d.getData, 0, d.getLength)
       }
     }
 
