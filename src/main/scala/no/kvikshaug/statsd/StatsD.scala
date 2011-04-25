@@ -28,7 +28,7 @@ object StatsD {
     def run {
       val s = new DatagramSocket(8125)
       val b: Array[Byte] = new Array(s.getReceiveBufferSize)
-      var d = new DatagramPacket(b, b.length)
+      val d = new DatagramPacket(b, b.length)
       println("Listening...")
 
       while(true) {
