@@ -5,16 +5,9 @@ import java.net._
 import scala.actors.Actor
 import scala.actors.Actor._
 
-object StatsD extends Runnable {
+object StatsD {
 
   val sleepTime = 10 // seconds
-
-  var running = true
-  Runtime.getRuntime().addShutdownHook(new Thread(this))
-  override def run {
-    println("Caught signal; exiting.")
-    running = false
-  }
 
   val inActor = new Incoming
   val inThread = new Thread(inActor)
@@ -38,7 +31,7 @@ object StatsD extends Runnable {
       var d = new DatagramPacket(b, b.length)
       println("Listening...")
 
-      while(running) {
+      while(true) {
         s.receive(d)
         val str = new String(d.getData, 0, d.getLength)
         inActor ! str
@@ -58,7 +51,7 @@ object StatsD extends Runnable {
 
   class Outgoing extends Actor with Runnable {
     def run {
-      while(running) {
+      while(true) {
         Thread.sleep(sleepTime * 1000)
       }
     }
