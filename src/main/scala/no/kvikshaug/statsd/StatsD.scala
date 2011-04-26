@@ -5,7 +5,16 @@ import java.net._
 import scala.actors.Actor
 import scala.actors.Actor._
 
-case class Metric(val name: String, val value: Double, val kind: String)
+case class Metric(var name: String, var values: List[Double], var kind: String) {
+  def update(other: Metric) {
+    kind = other.kind // in case the sender changed their mind
+    kind match {
+      case "retain" => values = other.values
+      case "count"  => values = List(values(0) + other.values(0))
+      case "time"   => values = other.values(0) :: values
+    }
+  }
+}
 
 object Parseable {
   val validKinds = List("retain", "count", "time")
@@ -19,7 +28,7 @@ object Parseable {
       if(!validKinds.contains(kind)) {
         throw new IllegalArgumentException("Unrecognized metric type: " + kind)
       }
-      Some(Metric(name, value, kind))
+      Some(Metric(name, List(value), kind))
     } catch {
       // TODO log instead of println
       case e => println("Couldn't parse string '" + str + "' because: " + e.toString); None
@@ -65,13 +74,15 @@ object StatsD {
       loop {
         receive {
           case Parseable(metric) =>
-            if(metrics.exists(_.name == metric.name)) {
-              // The metric exists, let's add to it based on what kind of metric it is
-              // TODO log
-            } else {
+            val existing = metrics.find(_.name == metric.name)
+            if(existing.isEmpty) {
               // The metric doesn't exist, add it to the list
               // TODO log
               metrics = metric :: metrics
+            } else {
+              // The metric exists, add to it
+              existing.get.update(metric)
+              // TODO log
             }
           case i => // TODO log
         }
