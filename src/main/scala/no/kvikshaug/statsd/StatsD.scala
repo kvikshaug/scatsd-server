@@ -38,7 +38,12 @@ object Parseable {
 
 object StatsD {
 
+  // TODO read this from config
   val sleepTime = 10 // seconds
+  val inHostsAllowed = List(InetAddress.getByName("127.0.0.1"))
+  val inPort = 8125
+  val outHost = "localhost"
+  val outPort = 2003
 
   var metrics = List[Metric]()
 
@@ -59,7 +64,7 @@ object StatsD {
 
   class Incoming extends Actor with Runnable {
     def run {
-      val s = new DatagramSocket(8125)
+      val s = new DatagramSocket(inPort)
       val b: Array[Byte] = new Array(s.getReceiveBufferSize)
       val d = new DatagramPacket(b, b.length)
       println("Listening...")
