@@ -5,37 +5,6 @@ import java.net._
 import scala.actors.Actor
 import scala.actors.Actor._
 
-case class Metric(var name: String, var values: List[Double], var kind: String) {
-  def update(other: Metric) {
-    kind = other.kind // in case the sender changed their mind
-    kind match {
-      case "retain" => values = other.values
-      case "count"  => values = List(values(0) + other.values(0))
-      case "time"   => values = other.values(0) :: values
-    }
-  }
-}
-
-object Parseable {
-  val validKinds = List("retain", "count", "time")
-
-  def unapply(str: String) = {
-    try {
-      val fields = str.split('|').toList
-      val name = fields(0)
-      val value = fields(1).toDouble
-      var kind = fields(2)
-      if(!validKinds.contains(kind)) {
-        throw new IllegalArgumentException("Unrecognized metric type: " + kind)
-      }
-      Some(Metric(name, List(value), kind))
-    } catch {
-      // TODO log instead of println
-      case e => println("Couldn't parse string '" + str + "' because: " + e.toString); None
-    }
-  }
-}
-
 object StatsD {
 
   // TODO read this from config
@@ -60,23 +29,5 @@ object StatsD {
     // Start sending data to graphite
     outActor.start
     outThread.start
-  }
-
-  class Outgoing extends Actor with Runnable {
-    def run {
-      while(true) {
-        Thread.sleep(sleepTime * 1000)
-      }
-    }
-
-    def act {
-      loop {
-        receive {
-          case str: String =>
-            // TODO send to graphite
-            println("Sending: " + str)
-        }
-      }
-    }
   }
 }
