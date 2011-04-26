@@ -71,7 +71,11 @@ object StatsD {
 
       while(true) {
         s.receive(d)
-        inActor ! new String(d.getData, 0, d.getLength)
+        if(inHostsAllowed.contains(d.getAddress)) {
+          inActor ! new String(d.getData, 0, d.getLength)
+        } else {
+          // TODO log
+        }
       }
     }
 
