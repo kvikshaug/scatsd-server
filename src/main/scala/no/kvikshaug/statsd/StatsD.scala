@@ -62,43 +62,6 @@ object StatsD {
     outThread.start
   }
 
-  class Incoming extends Actor with Runnable {
-    def run {
-      val s = new DatagramSocket(inPort)
-      val b: Array[Byte] = new Array(s.getReceiveBufferSize)
-      val d = new DatagramPacket(b, b.length)
-      println("Listening...")
-
-      while(true) {
-        s.receive(d)
-        if(inHostsAllowed.contains(d.getAddress)) {
-          inActor ! new String(d.getData, 0, d.getLength)
-        } else {
-          // TODO log
-        }
-      }
-    }
-
-    def act {
-      loop {
-        receive {
-          case Parseable(metric) =>
-            val existing = metrics.find(_.name == metric.name)
-            if(existing.isEmpty) {
-              // The metric doesn't exist, add it to the list
-              // TODO log
-              metrics = metric :: metrics
-            } else {
-              // The metric exists, add to it
-              existing.get.update(metric)
-              // TODO log
-            }
-          case i => // TODO log
-        }
-      }
-    }
-  }
-
   class Outgoing extends Actor with Runnable {
     def run {
       while(true) {
