@@ -10,6 +10,7 @@ object StatsD {
 
   // TODO read this from config
   val sleepTime = 10 // seconds
+  val connectWait = 1000 // waiting time before retries when connections to graphite fails. milliseconds
   val percentile = 90
   val inHostsAllowed = List(InetAddress.getByName("127.0.0.1"))
   val inPort = 8125

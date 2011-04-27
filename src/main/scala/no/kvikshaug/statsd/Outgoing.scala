@@ -1,6 +1,7 @@
 package no.kvikshaug.statsd
 
 import java.net._
+import java.io.PrintWriter
 
 import scala.actors.Actor
 import scala.actors.Actor._
@@ -46,10 +47,23 @@ class Outgoing extends java.util.TimerTask with Actor {
     loop {
       receive {
         case str: String =>
-          // TODO send to graphite
-          println("Sending: " + str)
+          val socket = connect()
+          val pw = new PrintWriter(socket.getOutputStream, true)
+          pw.println(str)
+          pw.close
+          socket.close
       }
     }
+  }
+
+  def connect(): Socket = {
+    try {
+      return new Socket(StatsD.outHost, StatsD.outPort)
+    } catch {
+      case e => // TODO log
+    }
+    Thread.sleep(StatsD.connectWait)
+    connect() // tail recursion
   }
 }
 
