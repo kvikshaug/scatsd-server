@@ -30,6 +30,7 @@ class Outgoing extends java.util.TimerTask with Actor {
           val upperPct = sorted((math.round((StatsD.percentile / 100.0) * sorted.size) - 1).toInt)
 
           sb.append(m.name + ".mean " + mean + " " + ts + "\n")
+          sb.append(m.name + ".median " + median(sorted) + " " + ts + "\n")
           sb.append(m.name + ".upper " + sorted.last + " " + ts + "\n")
           sb.append(m.name + ".upper_" + StatsD.percentile + " " + upperPct + " " + ts + "\n")
           sb.append(m.name + ".lower " + sorted.head + " " + ts + "\n")
@@ -64,6 +65,12 @@ class Outgoing extends java.util.TimerTask with Actor {
     }
     Thread.sleep(StatsD.connectWait)
     connect() // tail recursion
+  }
+
+  def median(l: List[Double]) = if(l.size % 2 == 0) {
+    ((l(l.size / 2)) + (l((l.size / 2) - 1))) / 2
+  } else {
+    l((l.size - 1) / 2)
   }
 }
 
