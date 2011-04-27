@@ -1,6 +1,7 @@
 package no.kvikshaug.statsd
 
 import java.net._
+import java.util.Timer
 
 import scala.actors.Actor
 import scala.actors.Actor._
@@ -22,8 +23,7 @@ object StatsD {
 
   val inActor = new Incoming
   val inThread = new Thread(inActor)
-  val outActor = new Outgoing
-  val outThread = new Thread(outActor)
+  val out = new Outgoing
 
   def main(args: Array[String]) {
     // Start listening for incoming data
@@ -31,7 +31,7 @@ object StatsD {
     inThread.start
 
     // Start sending data to graphite
-    outActor.start
-    outThread.start
+    out.start
+    new Timer().scheduleAtFixedRate(out, 0, sleepTime * 1000L)
   }
 }
