@@ -2,12 +2,14 @@ package no.kvikshaug.statsd
 
 case class Metric(var name: String, var values: List[Double], var kind: String) {
   def update(other: Metric) {
+    StatsD.busy = true
     kind = other.kind // in case the sender changed their mind
     kind match {
       case "retain" => values = other.values
       case "count"  => values = List(values(0) + other.values(0))
       case "time"   => values = other.values(0) :: values
     }
+    StatsD.busy = false
   }
 }
 

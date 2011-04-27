@@ -8,6 +8,10 @@ import scala.actors.Actor._
 class Outgoing extends Actor with Runnable {
   def run {
     while(true) {
+      while(StatsD.busy) {
+        Thread.sleep(10)
+        // TODO log
+      }
       Thread.sleep(StatsD.sleepTime * 1000)
     }
   }

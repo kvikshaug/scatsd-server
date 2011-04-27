@@ -16,6 +16,9 @@ object StatsD {
 
   var metrics = List[Metric]()
 
+  // true when a metric is being changed
+  var busy = false
+
   val inActor = new Incoming
   val inThread = new Thread(inActor)
   val outActor = new Outgoing
