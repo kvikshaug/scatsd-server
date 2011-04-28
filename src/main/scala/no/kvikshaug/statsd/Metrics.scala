@@ -27,7 +27,7 @@ object Parseable {
       }
       Some(Metric(name, List(value), kind))
     } catch {
-      case e => Logger.log("Couldn't parse string '" + str + "' because: " + e.toString); None
+      case e => Logger.log("ERROR: Incoming string '" + str + "' was unparseable because: " + e.toString); None
     }
   }
 }

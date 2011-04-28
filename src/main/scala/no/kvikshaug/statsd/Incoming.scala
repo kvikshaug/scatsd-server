@@ -37,7 +37,7 @@ class Incoming extends Actor with Runnable {
             existing.get.update(metric)
             Logger.addCount("Received metric updates", 1)
           }
-        case i => Logger.log("ERROR: Received unparseable data: " + i)
+        case _ =>
       }
     }
   }
