@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StatsD>
+  <!-- How often to send all accumulated metrics to graphite, seconds -->
+  <flushInterval>10</flushInterval>
+
+  <!-- How long to wait between each connection attempt to graphite,
+       if a connection can't be established. Milliseconds -->
+  <connectWait>1000</connectWait>
+
+  <!-- How often to show and reset accumulated values in the log, seconds
+       (Basically just outgoing and incoming metric counts) -->
+  <logCountInterval>10800</logCountInterval>
+
+  <!-- How high percentage of timings should be used to avoid spikes and
+       give a reasonable representation of upper timings -->
+  <percentile>90</percentile>
+
+  <!-- A list over hostnames/IPs that we will accept incoming connections
+       from -->
+  <hosts>
+    <host>127.0.0.1</host>
+  </hosts>
+
+  <!-- Which port to listen to incoming connections on -->
+  <port>8125</port>
+
+  <!-- Hostname and port we'll use to connect to graphite -->
+  <graphite>
+    <host>127.0.0.1</host>
+    <port>2003</port>
+  </graphite>
+</StatsD>
+

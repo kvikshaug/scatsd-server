@@ -3,20 +3,21 @@ package no.kvikshaug.statsd
 import java.net._
 import java.util.Timer
 
+import scala.xml._
 import scala.actors.Actor
 import scala.actors.Actor._
 
 object StatsD {
 
-  // TODO read this from config
-  val sleepTime = 10 // seconds
-  val connectWait = 1000 // waiting time before retries when connections to graphite fails. milliseconds
-  val logCountInterval = 10800 // seconds
-  val percentile = 90
-  val inHostsAllowed = List(InetAddress.getByName("127.0.0.1"))
-  val inPort = 8125
-  val outHost = "localhost"
-  val outPort = 2003
+  val config = XML.load("config.xml")
+  val flushInterval = (config \ "flushInterval").text.toLong
+  val connectWait = (config \ "connectWait").text.toInt
+  val logCountInterval = (config \ "logCountInterval").text.toInt
+  val percentile = (config \ "percentile").text.toInt
+  val inHostsAllowed = config \ "hosts" \ "host" map { h => InetAddress.getByName(h.text) }
+  val inPort = (config \ "port").text.toInt
+  val outHost = (config \ "graphite" \ "host").text
+  val outPort = (config \ "graphite" \ "port").text.toInt
 
   var metrics = List[Metric]()
 
@@ -38,6 +39,6 @@ object StatsD {
 
     // Start sending data to graphite
     out.start
-    new Timer().scheduleAtFixedRate(out, 0, sleepTime * 1000L)
+    new Timer().scheduleAtFixedRate(out, 0, flushInterval * 1000L)
   }
 }
