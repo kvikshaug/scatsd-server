@@ -1,6 +1,12 @@
 package no.kvikshaug.statsd
 
-case class Metric(var name: String, var values: List[Double], var kind: String) {
+import java.util.Date
+
+case class Interval(var interval: Double, var lastUpdate: Long, var skips: List[Long])
+case class Metric(var name: String, var values: List[Double], val interval: Interval, var kind: String) {
+
+  def intervalPassed = (new Date().getTime / 1000) - interval.interval >= interval.lastUpdate
+
   def update(other: Metric) {
     StatsD.busy = true
     kind = other.kind // in case the sender changed their mind
@@ -21,11 +27,12 @@ object Parseable {
       val fields = str.split('|').toList
       val name = fields(0)
       val value = fields(1).toDouble
-      var kind = fields(2)
+      val interval = Interval(fields(2).toDouble, new Date().getTime / 1000, List[Long]())
+      var kind = fields(3)
       if(!validKinds.contains(kind)) {
         throw new IllegalArgumentException("Unrecognized metric type: " + kind)
       }
-      Some(Metric(name, List(value), kind))
+      Some(Metric(name, List(value), interval, kind))
     } catch {
       case e => Logger.log("ERROR: Incoming string '" + str + "' was unparseable because: " + e.toString); None
     }

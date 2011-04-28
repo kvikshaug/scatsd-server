@@ -14,13 +14,14 @@ StatsD will:
 
 The StatsD metric format looks like this:
 
-    name|amount|kind
+    name|amount|interval|kind
 
 Where:
 
 1.  **name** is a graphite-compatible name of the metric (e.g. `foo.bar`)
 2.  **amount** is the current value of the metric (what we want to record)
-3.  **kind** can be one of these text strings:
+3.  **interval** specifies a per-metric level flush interval value in seconds. Higher values will give smoother graphs, but lower granularity. If 0, the default value (specified in the configfile) will be used. Setting this to something else only makes sense for *count* and *time* metrics.
+4.  **kind** can be one of these text strings:
     * *count* - The value will be accumulated. At each flush interval the accumulated value is sent to graphite and reset to 0.
     * *retain* - The value will be set, regardless of its previous value. At each flush interval the current value is sent to graphite, and kept.
     * *time* - Each value will be stored separately. At each flush interval, calulations are made on these values, sent to graphite, and the stored values are cleared.

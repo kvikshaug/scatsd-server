@@ -22,22 +22,37 @@ class Outgoing extends java.util.TimerTask with Actor {
           sb.append(m.name + " " + m.values(0) + " " + ts + "\n")
           Logger.addCount("Metrics sent to graphite", 1)
         case "count" =>
-          sb.append(m.name + " " + m.values(0) + " " + ts + "\n")
-          m.values = List(0)
+          if(m.intervalPassed) {
+            m.interval.skips.foreach { ts => sb.append(m.name + " " + m.values(0) + " " + ts + "\n"); }
+            sb.append(m.name + " " + m.values(0) + " " + ts + "\n")
+            m.values = List(0)
+            m.interval.skips = List[Long]()
+            m.interval.lastUpdate = ts
+          } else {
+            m.interval.skips = ts :: m.interval.skips
+          }
           Logger.addCount("Metrics sent to graphite", 1)
         case "time" if(m.values.size > 0) =>
-          val sorted = m.values.sortWith { _ < _ }
-          m.values = List()
-          val mean = sorted.sum / sorted.size.toDouble
-          val upperPct = sorted((math.round((StatsD.percentile / 100.0) * sorted.size) - 1).toInt)
-
-          sb.append(m.name + ".mean " + mean + " " + ts + "\n")
-          sb.append(m.name + ".median " + median(sorted) + " " + ts + "\n")
-          sb.append(m.name + ".upper " + sorted.last + " " + ts + "\n")
-          sb.append(m.name + ".upper_" + StatsD.percentile + " " + upperPct + " " + ts + "\n")
-          sb.append(m.name + ".lower " + sorted.head + " " + ts + "\n")
-          sb.append(m.name + ".count " + sorted.size + " " + ts + "\n")
-          Logger.addCount("Metrics sent to graphite", 6)
+          if(m.intervalPassed) {
+            val sorted = m.values.sortWith { _ < _ }
+            m.values = List()
+            val mean = sorted.sum / sorted.size.toDouble
+            val currentMedian = median(sorted)
+            val upperPct = sorted((math.round((StatsD.percentile / 100.0) * sorted.size) - 1).toInt)
+            m.interval.skips = ts :: m.interval.skips
+            m.interval.skips.foreach { ts =>
+              sb.append(m.name + ".mean " + mean + " " + ts + "\n")
+              sb.append(m.name + ".median " + currentMedian + " " + ts + "\n")
+              sb.append(m.name + ".upper " + sorted.last + " " + ts + "\n")
+              sb.append(m.name + ".upper_" + StatsD.percentile + " " + upperPct + " " + ts + "\n")
+              sb.append(m.name + ".lower " + sorted.head + " " + ts + "\n")
+              sb.append(m.name + ".count " + sorted.size + " " + ts + "\n")
+            }
+            m.interval.skips = List[Long]()
+            Logger.addCount("Metrics sent to graphite", 6)
+          } else {
+            m.interval.skips = ts :: m.interval.skips
+          }
         case _ =>
       }
     }
