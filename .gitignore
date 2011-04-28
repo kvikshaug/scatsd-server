@@ -5,4 +5,5 @@ project/plugins/project/build.properties
 src_managed/
 target/
 *swp
+config.xml
 
