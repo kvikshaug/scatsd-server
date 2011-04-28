@@ -58,7 +58,7 @@ The schema looks like this:
 * StatsD crashes when the connection to graphite is broken.
 * StatsD puts a prefix on the metric names before sending them to Graphite, I don't see the point of that at all.
 * StatsD cannot retain values. Etsy [commented][4] that they cheat and use the time mean + a graphite function to achieve this.
-* StatsD divides the accumulated counts by the flush interval. This means that the display will show per second-values, but 
+* StatsD divides the accumulated counts by the flush interval. This means that the y-axis on the graph will represent unit per second. So if a client just sends a metric with value 1, if the default flush interval of 10 seconds is used, the point on the y-axis will show 0.1 instead of 1. IMO, showing the actual value makes more sense than showing a per-second value by default, doesn't it?
 
 ## So why not just contribute to StatsD instead?
 
