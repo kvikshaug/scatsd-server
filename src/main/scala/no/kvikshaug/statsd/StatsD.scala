@@ -24,14 +24,14 @@ object StatsD {
   // true when a metric is being changed
   var busy = false
 
+  val timer = new Timer
   val inActor = new Incoming
   val inThread = new Thread(inActor)
   val out = new Outgoing
-  val logger = new Thread(Logger)
 
   def main(args: Array[String]) {
     // Start the logger
-    logger.start
+    timer.scheduleAtFixedRate(Logger, 0, logCountInterval * 1000L)
 
     // Start listening for incoming data
     inActor.start
@@ -39,6 +39,6 @@ object StatsD {
 
     // Start sending data to graphite
     out.start
-    new Timer().scheduleAtFixedRate(out, 0, flushInterval * 1000L)
+    timer.scheduleAtFixedRate(out, 0, flushInterval * 1000L)
   }
 }

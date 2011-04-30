@@ -1,8 +1,8 @@
 package no.kvikshaug.statsd
 
-import java.util.Date
+import java.util.{Date, TimerTask}
 
-object Logger extends Runnable {
+object Logger extends TimerTask {
 
   var counts = Map[String, Double]()
 
@@ -15,16 +15,13 @@ object Logger extends Runnable {
   }
 
   def run {
-    while(true) {
-      Thread.sleep(StatsD.logCountInterval * 1000)
-      if(counts.size == 0) {
-        println(time + "No logged counts yet.")
-      } else {
-        println(time + "Counts since last count:")
-      }
-      counts foreach { e => println(time + e._1 + ": " + e._2) }
-      counts = counts map { e => (e._1, 0.0) }
+    if(counts.size == 0) {
+      println(time + "No logged counts yet.")
+    } else {
+      println(time + "Counts since last count:")
     }
+    counts foreach { e => println(time + e._1 + ": " + e._2) }
+    counts = counts map { e => (e._1, 0.0) }
   }
 
   def log(message: String) {
