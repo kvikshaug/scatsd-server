@@ -1,4 +1,4 @@
-package no.kvikshaug.statsd
+package no.kvikshaug.scatsd
 
 import java.util.{Date, TimerTask}
 

@@ -1,4 +1,4 @@
-package no.kvikshaug.statsd
+package no.kvikshaug.scatsd
 
 import java.net._
 import java.util.Timer
@@ -7,7 +7,7 @@ import scala.xml._
 import scala.actors.Actor
 import scala.actors.Actor._
 
-object StatsD {
+object ScatsD {
 
   val config = XML.load("config.xml")
   val flushInterval = (config \ "flushInterval").text.toLong

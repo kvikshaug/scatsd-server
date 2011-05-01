@@ -1,18 +1,20 @@
-# StatsD
+# ScatsD
 
 A (slightly mutated) clone of [StatsD][1] written in [Scala][2].
 
-StatsD accumulates and forwards statistic data (metrics) to [Graphite][3].
+ScatsD accumulates and forwards statistic data (metrics) to [Graphite][3].
+
+The name fits with Scala, StatsD, and the design of firing off UDP packets and forgetting about them. *(What did YOU think scat means? Look it up!)*
 
 ## Overview
 
-StatsD will:
+ScatsD will:
 
-1. Receive metrics in StatsD-format over UDP at random intervals from its clients
+1. Receive metrics in ScatsD-format over UDP at random intervals from its clients
 2. Save them, sum them up, calculate arithmetic means and more
 2. Forward them at regular intervals in graphite-format to graphite
 
-The StatsD metric format looks like this:
+The ScatsD metric format looks like this:
 
     name|amount|interval|kind
 
@@ -28,7 +30,7 @@ Where:
 
 ### Time calculations
 
-When StatsD receives one or more *time* metrics within a flush interval, the following values are calculated, appended to the metric name and sent to graphite:
+When ScatsD receives one or more *time* metrics within a flush interval, the following values are calculated, appended to the metric name and sent to graphite:
 
 * The mean of all values
 * The median of all values

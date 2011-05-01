@@ -1,4 +1,4 @@
-package no.kvikshaug.statsd
+package no.kvikshaug.scatsd
 
 import java.util.Date
 
@@ -8,14 +8,14 @@ case class Metric(var name: String, var values: List[Double], val interval: Inte
   def intervalPassed = (new Date().getTime / 1000) - interval.interval >= interval.lastUpdate
 
   def update(other: Metric) {
-    StatsD.busy = true
+    ScatsD.busy = true
     kind = other.kind // in case the sender changed their mind
     kind match {
       case "retain" => values = other.values
       case "count"  => values = List(values(0) + other.values(0))
       case "time"   => values = other.values(0) :: values
     }
-    StatsD.busy = false
+    ScatsD.busy = false
   }
 }
 

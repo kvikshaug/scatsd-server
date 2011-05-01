@@ -1,4 +1,4 @@
-package no.kvikshaug.statsd
+package no.kvikshaug.scatsd
 
 import java.net._
 import java.io.PrintWriter
@@ -11,12 +11,12 @@ class Outgoing extends java.util.TimerTask with Actor {
   val sb = new StringBuilder
 
   def run {
-    while(StatsD.busy) {
+    while(ScatsD.busy) {
       Logger.addCount("Out-queue wait for incoming data to get updated (ms)", 10)
       Thread.sleep(10)
     }
     val ts = new java.util.Date().getTime / 1000
-    StatsD.metrics.foreach {
+    ScatsD.metrics.foreach {
       m => m.kind match {
         case "retain" =>
           sb.append(m.name + " " + m.values(0) + " " + ts + "\n")
@@ -38,13 +38,13 @@ class Outgoing extends java.util.TimerTask with Actor {
             m.values = List()
             val mean = sorted.sum / sorted.size.toDouble
             val currentMedian = median(sorted)
-            val upperPct = sorted((math.round((StatsD.percentile / 100.0) * sorted.size) - 1).toInt)
+            val upperPct = sorted((math.round((ScatsD.percentile / 100.0) * sorted.size) - 1).toInt)
             m.interval.skips = ts :: m.interval.skips
             m.interval.skips.foreach { ts =>
               sb.append(m.name + ".mean " + mean + " " + ts + "\n")
               sb.append(m.name + ".median " + currentMedian + " " + ts + "\n")
               sb.append(m.name + ".upper " + sorted.last + " " + ts + "\n")
-              sb.append(m.name + ".upper_" + StatsD.percentile + " " + upperPct + " " + ts + "\n")
+              sb.append(m.name + ".upper_" + ScatsD.percentile + " " + upperPct + " " + ts + "\n")
               sb.append(m.name + ".lower " + sorted.head + " " + ts + "\n")
               sb.append(m.name + ".count " + sorted.size + " " + ts + "\n")
             }
@@ -57,7 +57,7 @@ class Outgoing extends java.util.TimerTask with Actor {
       }
     }
     if(!sb.isEmpty) {
-      StatsD.out ! sb.toString
+      ScatsD.out ! sb.toString
       sb.clear
     }
   }
@@ -83,14 +83,14 @@ class Outgoing extends java.util.TimerTask with Actor {
 
   def connect(): Socket = {
     try {
-      return new Socket(StatsD.outHost, StatsD.outPort)
+      return new Socket(ScatsD.outHost, ScatsD.outPort)
     } catch {
       case e => if(!failed) {
-        Logger.log("Failed to connect to graphite: " + e.getMessage + " - will retry every " + StatsD.connectWait + " ms.")
+        Logger.log("Failed to connect to graphite: " + e.getMessage + " - will retry every " + ScatsD.connectWait + " ms.")
         failed = true
       }
     }
-    Thread.sleep(StatsD.connectWait)
+    Thread.sleep(ScatsD.connectWait)
     connect() // tail recursion
   }
 
