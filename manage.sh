@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
-PIDFILE=../../../scatsd.pid
-LOGFILE=../../../scatsd.log
+PIDFILE=scatsd.pid
+LOGFILE=scatsd.log
 
 function start() {
   pushd "$(dirname $0)/target/scala_2.8.1/classes/"
@@ -15,7 +15,7 @@ function stop() {
   if [ -e "$PIDFILE" ]
   then
       kill "$(cat $PIDFILE)"
-      rm "$PIDFILE"
+      echo "" > "$PIDFILE"
   fi
   popd
 }
