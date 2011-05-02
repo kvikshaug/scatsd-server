@@ -6,4 +6,6 @@ src_managed/
 target/
 *swp
 config.xml
+scatsd.log
+scatsd.pid
 
