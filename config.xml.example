@@ -29,5 +29,8 @@
     <host>127.0.0.1</host>
     <port>2003</port>
   </graphite>
+
+  <!-- Where to save the application state, which will be loaded on restart -->
+  <stateFile>scatsd.dat</stateFile>
 </StatsD>
 

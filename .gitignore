@@ -8,4 +8,5 @@ target/
 config.xml
 scatsd.log
 scatsd.pid
+scatsd.dat
 
