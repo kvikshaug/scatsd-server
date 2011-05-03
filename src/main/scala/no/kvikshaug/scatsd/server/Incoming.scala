@@ -1,4 +1,4 @@
-package no.kvikshaug.scatsd
+package no.kvikshaug.scatsd.server
 
 import java.net._
 

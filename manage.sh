@@ -5,7 +5,7 @@ LOGFILE=scatsd.log
 
 function start() {
   pushd "$(dirname $0)/target/scala_2.8.1/classes/"
-  scala no.kvikshaug.scatsd.ScatsD > $LOGFILE 2>&1 &
+  scala no.kvikshaug.scatsd.server.ScatsD > $LOGFILE 2>&1 &
   echo "$!" > $PIDFILE
   popd
 }
